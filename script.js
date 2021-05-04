@@ -1,19 +1,26 @@
-
-// Lowercase letters array, assembled less-than-painstakingly via loop
-var lowerLetters = [];
-for (let i = 0; i < 26; i++) {
-  lowerLetters[i] = String.fromCharCode(97 + i);
-}
-
-// Assemble the array for uppercase letters from the lowercase one
-var upperLetters = [];
-for (let i = 0; i < lowerLetters.length; i++) {
-  upperLetters[i] = lowerLetters[i].toUpperCase();
-}
-// The special characters, including the ones that cause string issues. Done manually 'cause who knows what the code range is to get all these guys?
-var specialCharacters = [
-" ", "!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", ":", ";", "<", "=", ">", "?", "@", "[", "\\", "]", "^", "_", "\`", "{", "|", "}", "~"
+// Array containing all the possible password characters in separate arrays
+var charArrays = [ [], [], [
+    " ", "!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", ":", ";", "<", "=", ">", "?", "@", "[", "\\", "]", "^", "_", "\`", "{", "|", "}", "~"
+  ],
+  [
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+  ]
 ]
+// A partner array containing the booleans for password criteria
+var hasChars = [false, false, false, false]
+// Generation of the contents of the lower and upper letters arrays. Saved some time, y'know?
+for (let i = 0; i < 26; i++) {
+  charArrays[0][i] = String.fromCharCode(97 + i);
+}
+for (let i = 0; i < charArrays[0].length; i++) {
+  charArrays[1][i] = charArrays[0][i].toUpperCase();
+}
+
+// A function that can pick a random value from any of the above arrays
+function pickItem(arr) {
+  var randoNum = Math.floor(Math.random() * arr.length);
+  return arr[randoNum];
+}
 
 function lengthCheck() {
   var passLength = window.prompt("How long should the password be? Type a number between 8 and 128.");
@@ -32,13 +39,23 @@ function lengthCheck() {
   }
 }
 
-function assemblePassword(passLength, hasLowerCase, hasUpperCase, hasNumbers, hasSpecChars) {
-  // Randomizes based on options provided.
-  for (let i = 0; i < passLength; i++) {
 
+function assemblePassword(passLength) {
+  var password = "";
+  var totalOptions = [];
+
+  // Loops through all the provided boolean values and creates a super list to pull all possible characters from
+  for (let i = 0; i < 4; i++) {
+    if (hasChars[i]) {
+      totalOptions = totalOptions.concat(charArrays[i]);
+    }
+  }
+  // Then for the length of the password, pick one symbol from the big list above
+  for (let i = 0; i < passLength; i++) {
+    password = password.concat(pickItem(totalOptions));
   }
 
-  return 0;
+  return password;
 }
 
 // Assignment code here
@@ -46,16 +63,16 @@ function generatePassword() {
   //  Make sure it's a valid length; 8 to 128 characters
   var passLength = lengthCheck();
   // Should it have lowercase letters?
-  var hasLowerCase = window.confirm("Do you want lowercase letters in the password?");
+  hasChars[0] = window.confirm("Do you want lowercase letters in the password?");
   // Should it have uppercase letters?
-  var hasUpperCase = window.confirm("Do you want uppercase letters in the password?");
+  hasChars[1] = window.confirm("Do you want uppercase letters in the password?");
   // Should it have numbers?
-  var hasNumbers = window.confirm("Do you want numbers in the password?");
+  hasChars[3] = window.confirm("Do you want numbers in the password?");
   // Should it have special characters?
-  var hasSpecChars = window.confirm("Do you want special characters in the password?");
+  hasChars[2] = window.confirm("Do you want special characters in the password?");
 
   // Time to make the password based on the prompts!
-  var password = assemblePassword(passLength, hasLowerCase, hasUpperCase, hasNumbers, hasSpecChars);
+  var password = assemblePassword(passLength);
 
   return password;
 }
